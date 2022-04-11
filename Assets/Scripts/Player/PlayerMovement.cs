@@ -26,7 +26,20 @@ public class PlayerMovement : MonoBehaviour
     // FixedUpdate for physics
     void FixedUpdate()
     {
-        transform.Translate(0, 0, direction * speed * Time.deltaTime, Space.Self);
+        // if we will hit something based on our current speed and direction, snap to it
+        Debug.DrawRay(transform.position, transform.forward * direction * speed, Color.red, 0.1f);
+        // RaycastHit hit;
+        // if (Physics.Raycast(transform.position, transform.forward * direction, out hit, speed * Time.deltaTime + pCol.radius))
+        // {
+        //     // transform.position = hit.point;
+        //     Debug.Log("hit "+hit.point);
+        // }
+        // // else, just move based on our current speed and direction
+        // else
+        // {
+            transform.Translate(0, 0, direction * speed * Time.deltaTime, Space.Self);
+        // }
+        // now collisions check to make sure we aren't overlapping anything
         checkCollisions();
     }
 
@@ -96,22 +109,26 @@ public class PlayerMovement : MonoBehaviour
                 // if we are colliding with the back of the wall, snap to the back of the wall
                 if(transform.position.z < col.bounds.min.z)
                 {
+                    Debug.Log("Collided with back of "+col.gameObject.name);
                     transform.position = new Vector3(transform.position.x, transform.position.y, col.transform.position.z - col.transform.localScale.z/2 - pCol.radius);
                 }
                 // if we are colliding with the front of the wall, snap to the front of the wall
                 else if(transform.position.z > col.bounds.max.z)
                 {
+                    Debug.Log("Collided with front of "+col.gameObject.name);
                     transform.position = new Vector3(transform.position.x, transform.position.y, col.transform.position.z + col.transform.localScale.z/2 + pCol.radius);
                 }
 
                 // if we are colliding with the left side of the wall, snap to the left side of the wall
                 if(transform.position.x < col.bounds.min.x)
                 {
+                    Debug.Log("Collided with left side of "+col.gameObject.name);
                     transform.position = new Vector3(col.transform.position.x - col.transform.localScale.x/2 - pCol.radius, transform.position.y, transform.position.z);
                 }
                 // if we are colliding with the right side of the wall, snap to the right side of the wall
                 else if(transform.position.x > col.bounds.max.x)
                 {
+                    Debug.Log("Collided with right side of "+col.gameObject.name);
                     transform.position = new Vector3(col.transform.position.x + col.transform.localScale.x/2 + pCol.radius, transform.position.y, transform.position.z);
                 }
             }
