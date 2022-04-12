@@ -27,7 +27,7 @@ public class PlayerMovement : MonoBehaviour
     void FixedUpdate()
     {
         // if we will hit something based on our current speed and direction, snap to it
-        Debug.DrawRay(transform.position, transform.forward * direction * speed, Color.red, 0.1f);
+        // Debug.DrawRay(transform.position, transform.forward * direction * speed, Color.red, 0.1f);
         // RaycastHit hit;
         // if (Physics.Raycast(transform.position, transform.forward * direction, out hit, speed * Time.deltaTime + pCol.radius))
         // {
