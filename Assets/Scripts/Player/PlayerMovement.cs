@@ -5,12 +5,16 @@ using UnityEngine;
 public class PlayerMovement : MonoBehaviour
 {
     private float speed;
-    private float direction;
-    public float walkSpeed;
-    public float runSpeed;
+    private float magnitude;
+    public float walkSpeed = 20f;
+    public float runSpeed = 40f;
     public float jumpSpeed;
     public float turnSpeed;
     public float gravity;
+
+    public float smoothMoveTime = .1f;
+    private float smoothInputMagnitude;
+    private float smoothMoveVelocity;
 
     private CapsuleCollider pCol;
 
@@ -19,26 +23,27 @@ public class PlayerMovement : MonoBehaviour
     void Start()
     {
         speed = walkSpeed;
-        direction = 0;
+        magnitude = 0;
         pCol = GetComponent<CapsuleCollider>();
     }
 
     // FixedUpdate for physics
     void FixedUpdate()
     {
-        // if we will hit something based on our current speed and direction, snap to it
-        // Debug.DrawRay(transform.position, transform.forward * direction * speed, Color.red, 0.1f);
-        // RaycastHit hit;
-        // if (Physics.Raycast(transform.position, transform.forward * direction, out hit, speed * Time.deltaTime + pCol.radius))
-        // {
-        //     // transform.position = hit.point;
-        //     Debug.Log("hit "+hit.point);
-        // }
-        // // else, just move based on our current speed and direction
-        // else
-        // {
-            transform.Translate(0, 0, direction * speed * Time.deltaTime, Space.Self);
-        // }
+        // if we will hit something based on our current speed and magnitude, snap to it
+        smoothInputMagnitude = Mathf.SmoothDamp(smoothInputMagnitude, magnitude, ref smoothMoveVelocity, smoothMoveTime); //smoothing magnitude so we accelerates/decelerates
+        RaycastHit hit;
+        if (Physics.Raycast(transform.position, transform.forward * smoothInputMagnitude, out hit, speed * Time.deltaTime + pCol.radius))
+        {
+            transform.Translate(transform.forward * smoothInputMagnitude * (hit.distance - pCol.radius), Space.World);
+            Debug.Log("hit "+hit.point);
+        }
+        // else, just move based on our current speed and magnitude
+        else
+        {
+            
+            transform.Translate(transform.forward * speed * smoothInputMagnitude * Time.deltaTime, Space.World);
+        }
         // now collisions check to make sure we aren't overlapping anything
         checkCollisions();
     }
@@ -60,14 +65,14 @@ public class PlayerMovement : MonoBehaviour
         #endregion
 
         #region "Movement"
-        direction = 0;
+        magnitude = 0;
         if (Input.GetKey(KeyCode.W))
         {
-            direction = 1;
+            magnitude = 1;
         }
         if (Input.GetKey(KeyCode.S))
         {
-            direction = -1;
+            magnitude = -1;
         }
         #endregion
         #region "Turning"
