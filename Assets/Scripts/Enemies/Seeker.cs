@@ -16,6 +16,8 @@ public class Seeker : MonoBehaviour
     public float viewDistance = 10f; // how far the enemy can see
     public float viewAngle = 90f; // how wide the enemy can see
 
+    private Vector3[] waypoints;
+
     Transform player; // the player we are seeking
 
     #region "Game"
@@ -36,7 +38,7 @@ public class Seeker : MonoBehaviour
         
 
         // create array of the waypoints positions
-        Vector3[] waypoints = new Vector3[pathHolder.childCount]; // same length as the number of children in the path
+        waypoints = new Vector3[pathHolder.childCount]; // same length as the number of children in the path
         for (int i = 0; i < waypoints.Length; i++)
         {
             waypoints[i] = pathHolder.GetChild(i).position;
@@ -128,22 +130,34 @@ public class Seeker : MonoBehaviour
     // called during the DrawGizmos frame
     void OnDrawGizmos(){
         // getting the path attached to this seeker
-        pathHolder = GameUtils.GetChildWithName(gameObject, "Path").transform; 
+        if(!Application.isPlaying){
+            pathHolder = GameUtils.GetChildWithName(gameObject, "Path").transform;
+            waypoints = new Vector3[pathHolder.childCount]; // same length as the number of children in the path
+            for (int i = 0; i < waypoints.Length; i++)
+            {
+                waypoints[i] = pathHolder.GetChild(i).position;
+                waypoints[i] = new Vector3(waypoints[i].x, transform.position.y, waypoints[i].z); // want the waypoint to be on the same y axis as the enemy
+            }
+        }
         //drawing a sphere and line for each waypoint to show the path in the editor
-        Vector3 startPosition = pathHolder.GetChild(0).position;
+        Vector3 startPosition = waypoints[0];
         Vector3 previousPosition = startPosition;
-        foreach (Transform waypoint in pathHolder)
+        foreach (Vector3 waypoint in waypoints)
         {
             Gizmos.color = Color.cyan;
-            Gizmos.DrawSphere(waypoint.position, 0.2f);
-            Gizmos.color = Color.red;
-            Gizmos.DrawLine(previousPosition, waypoint.position);
-            previousPosition = waypoint.position;
+            Gizmos.DrawSphere(waypoint, 0.2f);
+            Gizmos.color = Color.blue;
+            Gizmos.DrawLine(previousPosition, waypoint);
+            previousPosition = waypoint;
         }
         Gizmos.DrawLine(previousPosition, startPosition);
+        
+        
 
-        Gizmos.color = Color.yellow;
+        Gizmos.color = Color.red;
         Gizmos.DrawRay(transform.position, transform.forward * viewDistance);
+        Gizmos.DrawRay(transform.position, Quaternion.AngleAxis(viewAngle / 2, transform.up) * transform.forward * viewDistance);
+        Gizmos.DrawRay(transform.position, Quaternion.AngleAxis(-viewAngle / 2, transform.up) * transform.forward * viewDistance);
     }
 
 }
