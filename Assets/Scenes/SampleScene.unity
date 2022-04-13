@@ -236,6 +236,8 @@ MonoBehaviour:
   speed: 5
   waitTime: 0.2
   turnSpeed: 90
+  viewDistance: 10
+  viewAngle: 90
 --- !u!1 &169633918
 GameObject:
   m_ObjectHideFlags: 0
@@ -311,7 +313,7 @@ GameObject:
   - component: {fileID: 400077074}
   m_Layer: 0
   m_Name: Player
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -387,7 +389,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 400077073}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.8093586, y: 3.23, z: -8.55}
+  m_LocalPosition: {x: -0.8093586, y: 3.47, z: -8.55}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 963194228}
@@ -408,9 +410,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   walkSpeed: 20
   runSpeed: 50
-  jumpSpeed: 100
   turnSpeed: 200
-  gravity: 10
+  smoothMoveTime: 0.1
 --- !u!1 &466657627
 GameObject:
   m_ObjectHideFlags: 0
@@ -422,7 +423,7 @@ GameObject:
   - component: {fileID: 466657628}
   - component: {fileID: 466657629}
   m_Layer: 0
-  m_Name: Spot Light
+  m_Name: SpotLight
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -453,7 +454,7 @@ Light:
   serializedVersion: 10
   m_Type: 0
   m_Shape: 0
-  m_Color: {r: 0, g: 1, b: 0.07280898, a: 1}
+  m_Color: {r: 0.8490566, g: 0.7518411, b: 0, a: 1}
   m_Intensity: 8
   m_Range: 10
   m_SpotAngle: 90

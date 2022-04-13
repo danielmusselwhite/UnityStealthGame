@@ -11,30 +11,29 @@ public class Seeker : MonoBehaviour
     public float waitTime = .2f; // time to wait at each waypoint
     public float turnSpeed = 90; // rotate 90 degrees per second
 
-    // called during the DrawGizmos frame in the editor ONLY
-    void OnDrawGizmos(){
-        // getting the path attached to this seeker
-        pathHolder = GameUtils.GetChildWithName(gameObject, "Path").transform; 
-        //drawing a sphere and line for each waypoint to show the path in the editor
-        Vector3 startPosition = pathHolder.GetChild(0).position;
-        Vector3 previousPosition = startPosition;
-        foreach (Transform waypoint in pathHolder)
-        {
-            Gizmos.color = Color.cyan;
-            Gizmos.DrawSphere(waypoint.position, 0.2f);
-            Gizmos.color = Color.red;
-            Gizmos.DrawLine(previousPosition, waypoint.position);
-            previousPosition = waypoint.position;
-        }
-        Gizmos.DrawLine(previousPosition, startPosition);
-    }
+    private Light spotLight; 
+    private Color originalSpotLightColor;
+    public float viewDistance = 10f; // how far the enemy can see
+    public float viewAngle = 90f; // how wide the enemy can see
+
+    Transform player; // the player we are seeking
 
     #region "Game"
     // Start is called before the first frame update
     void Start()
     {
+        // get the player
+        player = GameObject.FindGameObjectWithTag("Player").transform;
+        
+        spotLight = GameUtils.GetChildWithName(gameObject, "SpotLight").GetComponent<Light>();
+        originalSpotLightColor = spotLight.color;
+        viewAngle = spotLight.spotAngle; // seekers view angle is the same as the spot light's angle
+
         // getting the path attached to this seeker
         pathHolder = GameUtils.GetChildWithName(gameObject, "Path").transform; 
+
+        // getting the spotLight attached to this seeker
+        
 
         // create array of the waypoints positions
         Vector3[] waypoints = new Vector3[pathHolder.childCount]; // same length as the number of children in the path
@@ -48,7 +47,30 @@ public class Seeker : MonoBehaviour
         StartCoroutine(FollowPath(waypoints));
     }
 
-    #region "Coroutines for movement"
+    bool canSeePlayer()
+    {
+        // if the player is in the view distance
+        if (Vector3.Distance(transform.position, player.position) < viewDistance)
+        {
+            // if the player is in the view angle
+            if (Vector3.Angle(transform.forward, (player.position - transform.position).normalized) < viewAngle / 2)
+            {
+                // if the player is in the line of sight
+                if (Physics.Linecast(transform.position, player.position, out RaycastHit hit, ~(1 << LayerMask.NameToLayer("Player"))))
+                {
+                    // if the player is the hit object
+                    if (hit.transform.CompareTag("Player"))
+                    {
+                        Debug.Log(gameObject.name+" can see player");
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    #region "Coroutines for following the path"
 
     // Coroutine handling logic to make the enemy follow the path
     IEnumerator FollowPath(Vector3[] waypoints)
@@ -92,8 +114,36 @@ public class Seeker : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        if(canSeePlayer())
+        {
+            spotLight.color = Color.red;
+        }
+        else
+        {
+            spotLight.color = originalSpotLightColor;
+        }
     }
     #endregion
+
+    // called during the DrawGizmos frame
+    void OnDrawGizmos(){
+        // getting the path attached to this seeker
+        pathHolder = GameUtils.GetChildWithName(gameObject, "Path").transform; 
+        //drawing a sphere and line for each waypoint to show the path in the editor
+        Vector3 startPosition = pathHolder.GetChild(0).position;
+        Vector3 previousPosition = startPosition;
+        foreach (Transform waypoint in pathHolder)
+        {
+            Gizmos.color = Color.cyan;
+            Gizmos.DrawSphere(waypoint.position, 0.2f);
+            Gizmos.color = Color.red;
+            Gizmos.DrawLine(previousPosition, waypoint.position);
+            previousPosition = waypoint.position;
+        }
+        Gizmos.DrawLine(previousPosition, startPosition);
+
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawRay(transform.position, transform.forward * viewDistance);
+    }
 
 }

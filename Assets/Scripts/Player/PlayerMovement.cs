@@ -8,9 +8,7 @@ public class PlayerMovement : MonoBehaviour
     private float magnitude;
     public float walkSpeed = 20f;
     public float runSpeed = 40f;
-    public float jumpSpeed;
     public float turnSpeed;
-    public float gravity;
 
     public float smoothMoveTime = .1f;
     private float smoothInputMagnitude;
@@ -85,16 +83,7 @@ public class PlayerMovement : MonoBehaviour
             transform.rotation *= Quaternion.Euler(0, turnSpeed * Time.deltaTime, 0);
         }
         #endregion
-
-        #region "player jumping control"
-        
-        #endregion
-        
-        #endregion
-
-
-        #region "applying gravity"
-        
+    
         #endregion
     }
 
@@ -107,9 +96,8 @@ public class PlayerMovement : MonoBehaviour
         {
            
             
-            // if the collision box is a wall
-            if(col.gameObject.tag == "Wall")
-            {
+            // if the collision box is not ours...
+            if(col.gameObject != gameObject){
                 Debug.Log(gameObject.name + "collided with wall " + col.gameObject.name);
                 // if we are colliding with the back of the wall, snap to the back of the wall
                 if(transform.position.z < col.bounds.min.z)
