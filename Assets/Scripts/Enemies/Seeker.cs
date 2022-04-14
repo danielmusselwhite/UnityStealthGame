@@ -6,7 +6,6 @@ using static GameUtils;
 public class Seeker : MonoBehaviour
 {
     private Transform pathHolder;
-
     public float speed = 5f; // speed of the enemy
     public float waitTime = .2f; // time to wait at each waypoint
     public float turnSpeed = 90; // rotate 90 degrees per second
@@ -63,7 +62,7 @@ public class Seeker : MonoBehaviour
                     // if the player is the hit object
                     if (hit.transform.CompareTag("Player"))
                     {
-                        Debug.Log(gameObject.name+" can see player");
+                        // Debug.Log(gameObject.name+" can see player");
                         return true;
                     }
                 }
