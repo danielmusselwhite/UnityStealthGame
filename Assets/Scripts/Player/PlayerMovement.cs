@@ -4,8 +4,9 @@ using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
 {
-    private float speed;
+    public float speed;
     private float magnitude;
+    public float crawlSpeed = 10f;
     public float walkSpeed = 20f;
     public float runSpeed = 40f;
     public float turnSpeed;
@@ -52,13 +53,14 @@ public class PlayerMovement : MonoBehaviour
         #region "player controls"
 
         #region "Speed"
-        if(Input.GetKeyDown(KeyCode.LeftShift))
+        speed = walkSpeed;
+        if(Input.GetKey(KeyCode.LeftShift))
         {
             speed = runSpeed;
         }
-        if(Input.GetKeyUp(KeyCode.LeftShift))
+        if(Input.GetKey(KeyCode.LeftControl))
         {
-            speed = walkSpeed;
+            speed = crawlSpeed;
         }
         #endregion
 
