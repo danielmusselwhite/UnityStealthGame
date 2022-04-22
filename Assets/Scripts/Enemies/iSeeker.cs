@@ -12,11 +12,13 @@ public class iSeeker : MonoBehaviour
     public Light spotLight;
     public Color chaseColor;
     public Color patrolColor;
-
+    public Color searchColor;
     public float turnSpeed = 90f; // rotate 90 degrees per second
     public float speed = 5f;
 
     public GameObject player; // player we are seeking
+
+    private CapsuleCollider pCol;
 
     void Start(){
         // getting the path attached to this seeker
@@ -40,6 +42,11 @@ public class iSeeker : MonoBehaviour
         // getting the path attached to this seeker
         pathHolder = GameUtils.GetChildWithName(gameObject, "Path").transform; 
 
+        pCol = GetComponent<CapsuleCollider>();
+    }
+
+    void FixedUpdate(){
+        GameUtils.checkCollisions(gameObject, transform, pCol);
     }
 
      void OnDrawGizmos(){
@@ -75,25 +82,43 @@ public class iSeeker : MonoBehaviour
     }
 
     public bool canSeePlayer()
+    {
+        // if the player is in the view distance
+        if (Vector3.Distance(transform.position, player.transform.position) < viewDistance)
         {
-            // if the player is in the view distance
-            if (Vector3.Distance(transform.position, player.transform.position) < viewDistance)
+            // if the player is in the view angle
+            if (Vector3.Angle(transform.forward, (player.transform.position - transform.position).normalized) < viewAngle / 2)
             {
-                // if the player is in the view angle
-                if (Vector3.Angle(transform.forward, (player.transform.position - transform.position).normalized) < viewAngle / 2)
+                // if the player is in the line of sight
+                if (Physics.Linecast(transform.position, player.transform.position, out RaycastHit hit, ~(1 << LayerMask.NameToLayer("Player"))))
                 {
-                    // if the player is in the line of sight
-                    if (Physics.Linecast(transform.position, player.transform.position, out RaycastHit hit, ~(1 << LayerMask.NameToLayer("Player"))))
+                    // if the player is the hit object
+                    if (hit.transform.CompareTag("Player"))
                     {
-                        // if the player is the hit object
-                        if (hit.transform.CompareTag("Player"))
-                        {
-                            // Debug.Log(gameObject.name+" can see player");
-                            return true;
-                        }
+                        // Debug.Log(gameObject.name+" can see player");
+                        return true;
                     }
                 }
             }
-            return false;
+        }
+        return false;
+    }
+
+    public void TurnToFace(Vector3 lookTarget){
+            // get the direction to the target
+            Vector3 directionToTarget = (lookTarget - transform.position).normalized;
+            // get the angle between the direction to the target and the direction the enemy is facing
+            float targetAngle = 90 - Mathf.Atan2(directionToTarget.z, directionToTarget.x) * Mathf.Rad2Deg;
+
+             if(Mathf.Abs(Mathf.DeltaAngle(transform.eulerAngles.y, targetAngle)) <= 0.05f){ // if we are in a threshold snap to it, set the angle to the target angle
+                transform.eulerAngles = Vector3.up * targetAngle; 
+                return; // and return as we don't want to keep rotating
+            }
+            // else, turn the enemy to face the target
+            else{
+                float angle = Mathf.MoveTowardsAngle(transform.eulerAngles.y, targetAngle, turnSpeed * Time.deltaTime);
+                transform.eulerAngles = Vector3.up * angle;
+            }
+
         }
 }
