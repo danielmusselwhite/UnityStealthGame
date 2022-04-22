@@ -7,16 +7,18 @@ namespace Enemies.MySeekerFSM{
     public class ChaseState : State
     {
 
-        public float turnSpeed = 180f; // rotate 180 degrees per second
-        public float speed = 5f;
-        private GameObject player;
-        
+        private iSeeker seeker; // reference to our interface, holding important variables
 
         public override void Start(GameObject gameObject, StateMachine SM)
         {
             Debug.Log("FSM | Entered Chase State");
             base.Start(gameObject, SM);
-            player = GameObject.FindGameObjectWithTag("Player");
+            
+            // get component of type "iSeeker" which is the interface holding our important values
+            seeker = gameObject.GetComponents<iSeeker>()[0];
+
+            seeker.spotLight.color = seeker.chaseColor; // set the spot light to the chase color
+
         }
 
         public override void Execute()
@@ -28,10 +30,10 @@ namespace Enemies.MySeekerFSM{
             {
                 Vector3 targetPos = new Vector3(player.transform.position.x, transform.position.y, player.transform.position.z); // set the target position to the player's position
                 TurnToFace(player.transform.position); // look at the player
-                transform.position = Vector3.MoveTowards(transform.position, targetPos, speed * Time.deltaTime); // move towards the player
+                transform.position = Vector3.MoveTowards(transform.position, targetPos, seeker.speed * Time.deltaTime); // move towards the player
             }
 
-            if (Vector3.Distance(transform.position, player.transform.position) > 10f){ // if the player is exceeding a threshold of units of the enemy, switch to PatrolState
+            if (!seeker.canSeePlayer()){ // if we can no longer see the player, switch to patrol state
                 SM.ChangeState(new PatrolState());
             }
         }
@@ -54,7 +56,7 @@ namespace Enemies.MySeekerFSM{
             }
             // else, turn the enemy to face the target
             else{
-                float angle = Mathf.MoveTowardsAngle(transform.eulerAngles.y, targetAngle, turnSpeed * Time.deltaTime);
+                float angle = Mathf.MoveTowardsAngle(transform.eulerAngles.y, targetAngle, seeker.turnSpeed * Time.deltaTime);
                 transform.eulerAngles = Vector3.up * angle;
             }
 
