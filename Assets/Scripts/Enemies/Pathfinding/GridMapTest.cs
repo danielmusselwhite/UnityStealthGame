@@ -16,13 +16,29 @@ public class GridMapTest : MonoBehaviour
     {
         grid = new GridMap(gridHeight, gridWidth, gridCellWidth, transform.position);   
         grid.SetValue(2,2,10);
+
+        // for each cell in grid, check if there is a Wall in the cell, if so, set the value of the cell to 1
+        for (int x = 0; x < gridWidth; x++){
+            for (int z = 0; z < gridHeight; z++){
+                Vector3 worldPosition = grid.GetWorldPosition(x, z);
+                Collider[] colliders = Physics.OverlapBox(worldPosition, new Vector3(gridCellWidth/2, 0.5f, gridCellWidth/2));
+                foreach(Collider collider in colliders){
+                    if(collider.gameObject.tag == "Wall"){
+                        grid.SetValue(x, z, 1);
+                    }
+                }
+            }
+        }        
+
+        
+        
     }
 
     void Update() {
-        if (Input.GetMouseButtonDown(0)){
+        // if (Input.GetMouseButtonDown(0)){
             
-            grid.SetValue(transform.position, grid.GetValue(transform.position) + 1);
-        }
+        //     grid.SetValue(transform.position, grid.GetValue(transform.position) + 1);
+        // }
     }
 
 
@@ -41,6 +57,16 @@ public class GridMapTest : MonoBehaviour
                 Debug.DrawLine(grid.GetWorldPosition(x, y), grid.GetWorldPosition(x, y + 1), Color.black);
                 Debug.DrawLine(grid.GetWorldPosition(x, y), grid.GetWorldPosition(x + 1, y), Color.black);
                 Handles.Label(grid.GetWorldPosition(x, y) + new Vector3(cellSize/2, 1, cellSize/2), grid.GetValue(x, y).ToString());
+            
+                // Colour code wall vs empty cells
+                if(grid.GetValue(x, y) == 1){
+                    Gizmos.color = new Color(1, 0, 0, 0.25f);
+                    Gizmos.DrawCube(grid.GetWorldPosition(x, y) + new Vector3(cellSize/2, 0, cellSize/2), new Vector3(cellSize, 0.5f, cellSize));
+                }
+                else{
+                    Gizmos.color = new Color(0, 1, 0, 0.25f);
+                    Gizmos.DrawCube(grid.GetWorldPosition(x, y) + new Vector3(cellSize/2, 0, cellSize/2), new Vector3(cellSize, 0.5f, cellSize));
+                }
             }
         }
         Debug.DrawLine(grid.GetWorldPosition(width, 0), grid.GetWorldPosition(width, height), Color.black);
