@@ -31,3 +31,4 @@
     3. **Searching**: Move in random directions looking for player
         * **Transition** to **Patroling** state if after n seconds we have not spotted the player
         * **Transition** to **Chasing** state if we spot the player
+        * TODO: instead of moving randomly, have it first move forwards for a few seconds in the last known direction of the player
