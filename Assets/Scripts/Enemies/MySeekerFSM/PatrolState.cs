@@ -7,8 +7,9 @@ namespace Enemies.MySeekerFSM{
     public class PatrolState : State
     {
         private iSeeker seeker; // reference to our interface, holding important variables
-        private int targetWaypointIndex;
+        private int targetWaypointIndex=1;
         private float targetAngle;
+        private bool firstTime; // required due to race condition in the "Start" between seeker and this
         
         
 
@@ -21,22 +22,27 @@ namespace Enemies.MySeekerFSM{
 
             // get component of type "iSeeker" which is the interface holding our important values
             seeker = gameObject.GetComponents<iSeeker>()[0];
-
-            seeker.spotLight.color = seeker.patrolColor; // set the spot light to the patrol color
-
-            targetWaypointIndex = 1; // the index of the next waypoint to go to
-            transform.LookAt(seeker.waypoints[targetWaypointIndex]); // look at the next waypoint
-            targetAngle = transform.eulerAngles.y; // the angle we want to be facing
+            firstTime=true;
+            
         }
 
 
         public override void Execute()
         {
             //if we can see the player, change to chase state
-            if(seeker.canSeePlayer())
-            {
+            if(seeker.canSeePlayer()){
                 SM.ChangeState(new ChaseState());
                 return;
+            }
+
+            // Defensive programming required due to race condition in the "Start" between seeker and this
+            if(firstTime){
+                // get the direction to the next target
+                Vector3 directionToTarget = (seeker.waypoints[targetWaypointIndex] - transform.position).normalized;
+                // get the angle between the direction to the target and the direction the enemy is facing
+                targetAngle = 90 - Mathf.Atan2(directionToTarget.z, directionToTarget.x) * Mathf.Rad2Deg;
+                seeker.SetSpotLightColour(seeker.patrolColor); // set the spot light to the patrol color
+                firstTime=false;
             }
             
             // Movetowards the next position in the path, if we are looking at it
@@ -53,8 +59,7 @@ namespace Enemies.MySeekerFSM{
                 }
             }
             // else, turn to face the target angle
-            else
-            {
+            else{
                 float angle = Mathf.MoveTowardsAngle(transform.eulerAngles.y, targetAngle, seeker.turnSpeed * Time.deltaTime);
                 transform.eulerAngles = Vector3.up * angle;
                 // if we are sufficiently close to facing the target, set the angle to the target angle

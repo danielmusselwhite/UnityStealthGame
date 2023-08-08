@@ -35,7 +35,7 @@ public class PlayerMovement : MonoBehaviour
         if (Physics.Raycast(transform.position, transform.forward * smoothInputMagnitude, out hit, speed * Time.deltaTime + pCol.radius))
         {
             transform.Translate(transform.forward * smoothInputMagnitude * (hit.distance - pCol.radius), Space.World);
-            Debug.Log("hit "+hit.point);
+            // Debug.Log("hit "+hit.point);
         }
         // else, just move based on our current speed and magnitude
         else

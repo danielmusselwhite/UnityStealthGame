@@ -16,13 +16,13 @@ namespace Enemies.MySeekerFSM{
 
         public override void Start(GameObject gameObject, StateMachine SM)
         {
-            Debug.Log("FSM | Entered Chase State");
+            Debug.Log("FSM | Entered Search State");
             base.Start(gameObject, SM);
             
             // get component of type "iSeeker" which is the interface holding our important values
             seeker = gameObject.GetComponents<iSeeker>()[0];
 
-            seeker.spotLight.color = seeker.searchColor; // set the spot light to the search color
+            seeker.SetSpotLightColour(seeker.searchColor); // set the spot light to the search color
 
             stateTimer = 10f;
 
@@ -62,7 +62,7 @@ namespace Enemies.MySeekerFSM{
 
         public override void Exit()
         {
-            Debug.Log("FSM | Exited Chase State");
+            Debug.Log("FSM | Exited Search State");
         }
     }
 }

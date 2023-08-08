@@ -18,7 +18,7 @@ namespace Enemies.MySeekerFSM{
             // get component of type "iSeeker" which is the interface holding our important values
             seeker = gameObject.GetComponents<iSeeker>()[0];
 
-            seeker.spotLight.color = seeker.chaseColor; // set the spot light to the chase color
+            seeker.SetSpotLightColour(seeker.chaseColor); // set the spot light to the chase color
             lastKnownPosition = seeker.player.transform.position;
         }
 

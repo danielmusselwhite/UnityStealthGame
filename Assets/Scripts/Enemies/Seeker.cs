@@ -25,16 +25,14 @@ public class Seeker : MonoBehaviour
     {
         // get the player
         player = GameObject.FindGameObjectWithTag("Player").transform;
-        
+
+        // getting the spotLight attached to this seeker
         spotLight = GameUtils.GetChildWithName(gameObject, "SpotLight").GetComponent<Light>();
         originalSpotLightColor = spotLight.color;
         viewAngle = spotLight.spotAngle; // seekers view angle is the same as the spot light's angle
-
+        
         // getting the path attached to this seeker
         pathHolder = GameUtils.GetChildWithName(gameObject, "Path").transform; 
-
-        // getting the spotLight attached to this seeker
-        
 
         // create array of the waypoints positions
         waypoints = new Vector3[pathHolder.childCount]; // same length as the number of children in the path

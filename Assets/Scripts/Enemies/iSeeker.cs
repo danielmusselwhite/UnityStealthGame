@@ -9,7 +9,7 @@ public class iSeeker : MonoBehaviour
     public float viewDistance = 10f; // how far the enemy can see
     public float viewAngle = 90f; // how wide the enemy can see
     public float waitTime = .2f; // time to wait at each waypoint
-    public Light spotLight;
+    protected Light spotLight;
     public Color chaseColor;
     public Color patrolColor;
     public Color searchColor;
@@ -121,4 +121,8 @@ public class iSeeker : MonoBehaviour
             }
 
         }
+
+    public void SetSpotLightColour(Color color){
+        spotLight.color = color;
+    }
 }
